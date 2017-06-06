@@ -5,7 +5,7 @@ http://arxiv.org/abs/1705.03122
 
 import tensorflow as tf
 import numpy as np
-from typing import Any, List, Union, Type
+from typing import Any, List, Union, Type, Optional
 from typeguard import check_argument_types
 
 from neuralmonkey.encoders.attentive import Attentive
@@ -31,8 +31,8 @@ class ConvolutionalSentenceEncoder(ModelPart):#, Attentive):
                  max_input_len: int,
                  encoder_layers: int,
                  kernel_width: int = 5,
-                 save_checkpoint: str = None,
-                 load_checkpoint: str = None) -> None:
+                 save_checkpoint: Optional[str] = None,
+                 load_checkpoint: Optional[str] = None) -> None:
 
         ModelPart.__init__(self, name, save_checkpoint, load_checkpoint)
         #Attentive.__init__(self, None) # TODO attention
