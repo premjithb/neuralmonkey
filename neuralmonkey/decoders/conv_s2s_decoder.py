@@ -51,10 +51,13 @@ class ConvolutionalSentenceDecoder(ModelPart):
 
         with self.use_scope():
             with tf.variable_scope("decoder") as self.step_scope:
-                decoded = self.decoding_loop(train_mode=True)
+                self.dec = self.decoding_loop(train_mode=True)
+
+                # doplnit loss
 
     def decoding_loop(self, train_mode):
         decoded_words = []
+        output_words = []
         prev_word = None
 
         for i in range(self.max_output_len):
@@ -77,9 +80,10 @@ class ConvolutionalSentenceDecoder(ModelPart):
                 convolutions = self.residual_conv(
                     convolutions, "decoder_conv_{}".format(layer))
 
+            output_words.append(linear(convolutions, self.vocabulary_size, "decoder_output"))
 
+        return output_words
 
-        ipdb.set_trace()
 
     def residual_conv(self, input, name):
         # TODO: tyto konvoluce jsou udelame spatne, musi se odstranovat v kazdem kroku prvky napravo, viz clanek
@@ -174,15 +178,15 @@ class ConvolutionalSentenceDecoder(ModelPart):
 
     @tensor
     def decoded(self) -> tf.Tensor:
-        return decoded
+        return self.dec
 
     @tensor
     def logprobs(self) -> tf.Tensor:
         return tf.nn.log_softmax(self.logits)
 
-    @tensor
-    def logits(self) -> tf.Tensor:
-        return logits
+    # @tensor
+    # def logits(self) -> tf.Tensor:
+    #     return logits
 
     def feed_dict(self, dataset: Dataset, train: bool = False) -> FeedDict:
         fd = {}  # type: FeedDict
