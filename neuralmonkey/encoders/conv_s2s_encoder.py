@@ -121,8 +121,6 @@ class ConvolutionalSentenceEncoder(ModelPart):#, Attentive):
 
             return glu(conv) + input
 
-
-
     @tensor
     def train_mode(self):
         # scalar tensor
