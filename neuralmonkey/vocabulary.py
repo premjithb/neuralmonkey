@@ -258,6 +258,8 @@ class Vocabulary(collections.Sized):
         if tokenized_text:
             self.add_tokenized_text(tokenized_text)
 
+
+
     def __len__(self) -> int:
         """Get the size of the vocabulary.
 
@@ -429,6 +431,7 @@ class Vocabulary(collections.Sized):
             The shape of the padding vector is the same as of the sentence
             vector.
         """
+
         if pad_to_max_len and max_len is not None:
             batch_max_len = max_len
         else:

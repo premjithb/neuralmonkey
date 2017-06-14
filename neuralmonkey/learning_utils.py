@@ -13,6 +13,7 @@ from neuralmonkey.logging import log, log_print, warn, notice
 from neuralmonkey.dataset import Dataset, LazyDataset
 from neuralmonkey.tf_manager import TensorFlowManager
 from neuralmonkey.runners.base_runner import BaseRunner, ExecutionResult
+from neuralmonkey.runners.word2vec import Word2Vec
 from neuralmonkey.trainers.generic_trainer import GenericTrainer
 from neuralmonkey.tf_utils import gpu_memusage
 from typeguard import check_argument_types
@@ -44,6 +45,7 @@ def training_loop(tf_manager: TensorFlowManager,
                   val_preview_output_series: Optional[List[str]] = None,
                   val_preview_num_examples: int = 15,
                   train_start_offset: int = 0,
+                  sequence_w2c=None,
                   runners_batch_size: Optional[int] = None,
                   initial_variables: Optional[Union[str, List[str]]] = None,
                   postprocess: Postprocess = None) -> None:
@@ -139,6 +141,8 @@ def training_loop(tf_manager: TensorFlowManager,
             log_directory, tf_manager.sessions[0].graph)
         log("TensorBoard writer initialized.")
 
+    w2v_model = Word2Vec(tf_manager.sessions[0], sequence_w2c, "experiments/questions")
+
     log("Starting training")
     last_log_time = time.process_time()
     last_val_time = time.process_time()
@@ -188,6 +192,7 @@ def training_loop(tf_manager: TensorFlowManager,
                 if _is_logging_time(step, val_period_batch,
                                     last_val_time, val_period_time):
                     log_print("")
+                    w2v_model.eval()
                     val_duration_start = time.process_time()
                     val_examples = 0
                     for val_id, valset in enumerate(val_datasets):
@@ -264,6 +269,7 @@ def training_loop(tf_manager: TensorFlowManager,
                                          steptime, valtime), color="blue")
                     if training_duration < 2 * val_duration:
                         notice("Validation period setting is inefficient.")
+
 
                     log_print("")
                     last_val_time = time.process_time()

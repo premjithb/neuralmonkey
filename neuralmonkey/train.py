@@ -33,6 +33,7 @@ def create_config() -> Configuration:
     config.add_argument('output')
     config.add_argument('evaluation')
     config.add_argument('runners')
+    config.add_argument('sequence_w2c')
     config.add_argument('test_datasets', required=False, default=[])
     config.add_argument('logging_period', required=False, default=20)
     config.add_argument('validation_period', required=False, default=500)
@@ -221,6 +222,7 @@ def main() -> None:
         val_preview_output_series=cfg.model.val_preview_output_series,
         val_preview_num_examples=cfg.model.val_preview_num_examples,
         postprocess=cfg.model.postprocess,
+        sequence_w2c=cfg.model.sequence_w2c,
         train_start_offset=cfg.model.train_start_offset,
         runners_batch_size=cfg.model.runners_batch_size,
         initial_variables=cfg.model.initial_variables)

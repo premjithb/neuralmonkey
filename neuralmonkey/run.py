@@ -31,6 +31,7 @@ CONFIG.ignore_argument('logging_period')
 CONFIG.ignore_argument('visualize_embeddings')
 CONFIG.ignore_argument('minimize')
 CONFIG.ignore_argument('random_seed')
+CONFIG.add_argument('sequence_w2c')
 CONFIG.ignore_argument('save_n_best')
 CONFIG.ignore_argument('overwrite_output_dir')
 
@@ -110,6 +111,10 @@ def main() -> None:
 
     if args.grid and len(datasets_model.test_datasets) > 1:
         raise ValueError("Only one test dataset supported when using --grid")
+
+    from neuralmonkey.runners.word2vec import Word2Vec
+    w2v_model = Word2Vec(CONFIG.model.tf_manager.sessions[0], CONFIG.model.sequence_w2c, "experiments/questions")
+    w2v_model.eval()
 
     for dataset in datasets_model.test_datasets:
         if args.grid:

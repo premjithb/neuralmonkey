@@ -82,6 +82,7 @@ class EmbeddedFactorSequence(Sequence):
                  data_ids: List[str],
                  embedding_sizes: List[int],
                  max_length: int = None,
+                 initialization_version: str = None,
                  save_checkpoint: str = None,
                  load_checkpoint: str = None) -> None:
         """Construct a new instance of `EmbeddedFactorSequence`
@@ -110,6 +111,7 @@ class EmbeddedFactorSequence(Sequence):
         self.vocabulary_sizes = [len(vocab) for vocab in self.vocabularies]
         self.data_ids = data_ids
         self.embedding_sizes = embedding_sizes
+        self.initialization_version = initialization_version
 
         if not (len(self.data_ids)
                 == len(self.vocabularies)
@@ -158,13 +160,49 @@ class EmbeddedFactorSequence(Sequence):
         # TODO better initialization
         # embedding matrices are numbered rather than named by the data id so
         # the data_id string does not need to be the same across experiments
-        return [
-            tf.get_variable(
-                name="embedding_matrix_{}".format(i),
-                shape=[vocab_size, emb_size],
-                initializer=tf.random_normal_initializer(stddev=0.01))
-            for i, (data_id, vocab_size, emb_size) in enumerate(zip(
-                self.data_ids, self.vocabulary_sizes, self.embedding_sizes))]
+
+        # return [
+        #     tf.get_variable(
+        #         name="embedding_matrix_{}".format(i),
+        #         shape=[vocab_size, emb_size],
+        #         initializer=tf.random_normal_initializer(stddev=0.01))
+        #     for i, (data_id, vocab_size, emb_size) in enumerate(zip(
+        #         self.data_ids, self.vocabulary_sizes, self.embedding_sizes))]
+
+        if self.initialization_version == "normal0.001":
+            return [
+                tf.get_variable(
+                    name="embedding_matrix_{}".format(i),
+                    shape=[vocab_size, emb_size],
+                    initializer=tf.random_normal_initializer(stddev=0.001))
+                for i, (data_id, vocab_size, emb_size) in enumerate(zip(
+                    self.data_ids, self.vocabulary_sizes, self.embedding_sizes))]
+        elif self.initialization_version == "normal0.01":
+            return [
+                tf.get_variable(
+                    name="embedding_matrix_{}".format(i),
+                    shape=[vocab_size, emb_size],
+                    initializer=tf.random_normal_initializer(stddev=0.01))
+                for i, (data_id, vocab_size, emb_size) in enumerate(zip(
+                    self.data_ids, self.vocabulary_sizes, self.embedding_sizes))]
+        elif self.initialization_version == "normal0.1":
+            return [
+                tf.get_variable(
+                    name="embedding_matrix_{}".format(i),
+                    shape=[vocab_size, emb_size],
+                    initializer=tf.random_normal_initializer(stddev=0.1))
+                for i, (data_id, vocab_size, emb_size) in enumerate(zip(
+                    self.data_ids, self.vocabulary_sizes, self.embedding_sizes))]
+        elif self.initialization_version == "normal1":
+            return [
+                tf.get_variable(
+                    name="embedding_matrix_{}".format(i),
+                    shape=[vocab_size, emb_size],
+                    initializer=tf.random_normal_initializer(stddev=1))
+                for i, (data_id, vocab_size, emb_size) in enumerate(zip(
+                    self.data_ids, self.vocabulary_sizes, self.embedding_sizes))]
+        else:
+            raise ValueError("initialization of embeddings is incorrect")
 
     @tensor
     def data(self) -> tf.Tensor:
@@ -231,6 +269,7 @@ class EmbeddedSequence(EmbeddedFactorSequence):
                  vocabulary: Vocabulary,
                  data_id: str,
                  embedding_size: int,
+                 initialization_version: str = None,
                  max_length: int = None,
                  save_checkpoint: str = None,
                  load_checkpoint: str = None) -> None:
@@ -254,6 +293,7 @@ class EmbeddedSequence(EmbeddedFactorSequence):
             data_ids=[data_id],
             embedding_sizes=[embedding_size],
             max_length=max_length,
+            initialization_version=initialization_version,
             save_checkpoint=save_checkpoint,
             load_checkpoint=load_checkpoint)
 
