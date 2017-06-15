@@ -520,7 +520,8 @@ class Vocabulary(collections.Sized):
             for i in range(len(self.index_to_word)):
                 output_file.write(self.index_to_word[i])
                 if save_frequencies:
-                    output_file.write(self.word_count[self.index_to_word[i]])
+                    output_file.write(
+                        "\t" + str(self.word_count[self.index_to_word[i]]))
                 output_file.write("\n")
 
     def log_sample(self, size: int = 5):
